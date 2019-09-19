@@ -49,7 +49,7 @@ bytes.
 
 Triple redundancy simply sends every packet 3 times. So the total overhead for sending a file is:
 ```
-overhead = 4 * k * 3 + 2
+overhead = 4 * k * 3 + 2 * k * n + 2, where n is the size of the packet in bytes
 ```
 bytes.
 
@@ -57,8 +57,9 @@ bytes.
 
 XOR creates a redundant packet C, which is the result of exclusive OR of packets A and B. Packet C has the same size as packets A and B, so the total overhead for XOR is:
 ```
-overhead = 4 * (k + floor(k / 2)) + 2, where floor(k / 2) is the number of redundant C packets.
+overhead = 4 * (k + floor(k / 2)) + floor(k / 2) * n + 2, where floor(k / 2) is the number of redundant C packets and n is the size of the packet in bytes
 ```
+bytes.
 
 ## How does	increasing loss rate affect the	success	rate of	decoding?
 
