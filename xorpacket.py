@@ -1,4 +1,4 @@
-from packet import decode_packet, xor, convert_bytes_to_string
+from packet import decode_packet, sxor, convert_bytes_to_string
 from filehandling import FileHandling
 import math
 
@@ -27,12 +27,12 @@ class XorPacket(object):
       # packetC
       if self.previouslyReceivedA[0] + 2 == packetNumber and self.previouslyReceivedB[0] + 1 != packetNumber:
         # We can get packetB with A and C
-        packetB = xor(convert_bytes_to_string(self.previouslyReceivedA[1]), text)
+        packetB = sxor(convert_bytes_to_string(self.previouslyReceivedA[1]), text)
         if self.received_package_is_legit(packetNumber - 1, packetB):
           self.receivedPackets += 1
       elif self.previouslyReceivedB[0] + 1 == packetNumber and self.previouslyReceivedA[0] + 2 != packetNumber:
         # We can get packetA with B and C
-        packetA = xor(convert_bytes_to_string(self.previouslyReceivedB[1]), text)
+        packetA = sxor(convert_bytes_to_string(self.previouslyReceivedB[1]), text)
         if self.received_package_is_legit(packetNumber - 2, packetA):
           self.receivedPackets += 1
   

@@ -1,6 +1,6 @@
 import socket
 from filehandling import FileHandling
-from packet import create_packet, create_info_packet, xor
+from packet import create_packet, create_info_packet, sxor
 import random
 
 class Client(object):
@@ -10,13 +10,14 @@ class Client(object):
     self.method = method
     self.loss = loss
     self.packet_number = 1
+    self.filehandler = FileHandling("data.txt")
   
   def send_file(self):
+    print("\nSending file...\n")
     # Let's the server know which method is used
     self.acknowledge_server_on_start()
-    filehandler = FileHandling("data.txt")
     packetNumber = 0
-    text = filehandler.read_bytes(packetNumber * 100)
+    text = self.filehandler.read_bytes(packetNumber * 100)
     while text:
       # Now there is data to be sent, next we need to modify it into a packet
       if self.method == "triple":
@@ -24,17 +25,23 @@ class Client(object):
       elif self.method == "xor":
         self.handle_xor_packet(text)
       packetNumber += 1
-      text = filehandler.read_bytes(packetNumber * 100)
+      text = self.filehandler.read_bytes(packetNumber * 100)
+    self.end_file_sending(packetNumber)
+  
+  def end_file_sending(self, packetNumber):
     print()
+    print("********** FINISHED ************")
+    print("File size in bytes:", self.filehandler.file_size())
     print("Original data packets sent:", packetNumber)
     if self.method == "triple":
-      print("Total amount of packets sent:", (self.packet_number - 1) * 3)
+      print("Total amount of packets sent (exluding info packets):", (self.packet_number - 1) * 3)
     elif self.method == "xor":
-      print("Total amount of packets sent:", self.packet_number - 1)
+      print("Total amount of packets sent (exluding info packets):", self.packet_number - 1)
+    print("********************************")
     print()
     self.acknowledge_server_on_end()
     self.sock.close()
-    filehandler.close()
+    self.filehandler.close()
   
   def handle_triple_packet(self, text):
     # Create 3 packets and send all of them
@@ -58,7 +65,7 @@ class Client(object):
 
     if self.packet_number % 3 == 0:
       # packetA and packetB has been sent, need to create packetC and send it
-      packetC = xor(self.packetA_text, self.packetB_text)
+      packetC = sxor(self.packetA_text, self.packetB_text)
       data = create_packet(self.packet_number, packetC)
       self.send_packet(data, self.loss)
       self.packet_number += 1
@@ -100,14 +107,14 @@ def ask_method():
 def ask_loss_rate():
   loss = 0
   while True:
-    user_input = input("\nGive the package loss rate (0 - 100)\n")
+    user_input = input("\nGive the packet loss rate (0 - 100)\n")
     try:
       loss = int(user_input)
       if loss >= 0 and loss <= 100:
         return loss
       else: raise ValueError
     except ValueError:
-      print("Must be a number between 0 and 100!")
+      print("Must be an integer between 0 and 100!")
 
 if __name__ == "__main__":
   method = ask_method()

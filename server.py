@@ -1,6 +1,5 @@
 import socket
-import time
-from packet import decode_packet, convert_bytes_to_string, convert_string_to_binary, decode_info_packet
+from packet import decode_packet, convert_bytes_to_string, decode_info_packet
 from triplepacket import TriplePacket
 from xorpacket import XorPacket
 
@@ -39,7 +38,7 @@ class Server(object):
   
   def end_of_file_transmission(self):
     print()
-    print("*********************************************")
+    print("***************** FINISHED ******************")
     print("Data packets received with triple redundancy:", self.triplePacket.received_packets())
     print("Data packets received with XOR:", self.xorPacket.received_packets())
     print("Total amount of packets received (excluding info packets):", self.receivedDataPackets)
